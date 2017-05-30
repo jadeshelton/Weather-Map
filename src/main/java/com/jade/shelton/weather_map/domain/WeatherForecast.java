@@ -1,6 +1,8 @@
 package com.jade.shelton.weather_map.domain;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 public class WeatherForecast implements Serializable {
 
@@ -19,7 +21,13 @@ public class WeatherForecast implements Serializable {
 	}
 
 	public String setParamsReturnUrl(String location) {
-		url += location + ".json";
+		String encodedUrl = null;
+		try {
+			encodedUrl = URLEncoder.encode(location, "UTF-8").replace("+", "%20");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		url += encodedUrl + ".json";
 		return url;
 	}
 

@@ -12,6 +12,7 @@ public class Weather extends EasyApiObject implements Serializable {
 	private static final long serialVersionUID = -3797435200745446335L;
 	private String apiKey;
 	protected static String BASE_URL = "http://api.wunderground.com/api/";
+	private String url = "";
 
 	/**
 	 * Create a Weather Underground API object, which will provide factories to
@@ -38,6 +39,10 @@ public class Weather extends EasyApiObject implements Serializable {
 
 	public WeatherForecast createForecastObject() {
 		return new WeatherForecast(apiKey);
+	}
+
+	public WeatherHourly createHourlyObject() {
+		return new WeatherHourly(apiKey);
 	}
 
 	@Override

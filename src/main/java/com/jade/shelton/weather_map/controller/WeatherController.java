@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jade.shelton.weather_map.domain.WeatherConditions;
 import com.jade.shelton.weather_map.domain.WeatherForecast;
+import com.jade.shelton.weather_map.domain.WeatherHourly;
 import com.jade.shelton.weather_map.service.WeatherService;
 
 /**
@@ -36,6 +37,13 @@ public class WeatherController {
 	public Object getForecastData(@PathVariable String city) {
 		WeatherForecast forecast = service.getForecast(ak, city);
 		return forecast;
+
+	}
+
+	@RequestMapping(value = "/hourly/city/{city}")
+	public Object getHourlyData(@PathVariable String city) {
+		WeatherHourly hourly = service.getHourly(ak, city);
+		return hourly;
 
 	}
 }

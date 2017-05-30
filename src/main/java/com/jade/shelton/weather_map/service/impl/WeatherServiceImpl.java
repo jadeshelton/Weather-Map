@@ -13,10 +13,21 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.jade.shelton.weather_map.domain.Weather;
 import com.jade.shelton.weather_map.domain.WeatherConditions;
 import com.jade.shelton.weather_map.domain.WeatherForecast;
+import com.jade.shelton.weather_map.domain.WeatherHourly;
 import com.jade.shelton.weather_map.service.WeatherService;
 
 @Service
 public class WeatherServiceImpl implements WeatherService {
+
+	public WeatherHourly getHourly(String key, String city) {
+		Weather weatherObject = new Weather(key);
+		WeatherHourly hourly = weatherObject.createHourlyObject();
+		String url = hourly.setParamsReturnUrl(city);
+		hourly = downloadHourly(hourly, url);
+
+		return hourly;
+
+	}
 
 	public WeatherConditions getConditions(String key, String city) {
 		Weather weatherObject = new Weather(key);
@@ -31,10 +42,31 @@ public class WeatherServiceImpl implements WeatherService {
 		Weather weatherObject = new Weather(key);
 		WeatherForecast forecast = weatherObject.createForecastObject();
 		String url = forecast.setParamsReturnUrl(city);
-		forecast = downloadDataHere(forecast, url);
+		forecast = downloadConditions(forecast, url);
 
 		return forecast;
 
+	}
+
+	private WeatherHourly downloadHourly(WeatherHourly hourly, String url) {
+		JSONObject result;
+		String json = "";
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+
+		try {
+			result = constructJSON(url);
+			json = result.toString();
+			mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+			hourly = mapper.readValue(json, WeatherHourly.class);
+
+		} catch (Exception e1) {
+
+			e1.printStackTrace();
+			System.out.println("There was a problem " + e1);
+		}
+
+		return hourly;
 	}
 
 	private WeatherConditions downloadConditions(WeatherConditions conditions, String url) {
@@ -58,7 +90,7 @@ public class WeatherServiceImpl implements WeatherService {
 		return conditions;
 	}
 
-	private WeatherForecast downloadDataHere(WeatherForecast forecast, String url) {
+	private WeatherForecast downloadConditions(WeatherForecast forecast, String url) {
 		JSONObject result;
 		String json = "";
 		try {
@@ -78,10 +110,8 @@ public class WeatherServiceImpl implements WeatherService {
 	private JSONObject constructJSON(String URL) {
 
 		String content = "";
-		URL.replace(" ", "%20");
 
 		try {
-
 			URL Url = new URL(URL);
 			URLConnection conn = Url.openConnection();
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
