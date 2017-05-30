@@ -53,12 +53,14 @@ public class Controller {
 
 		Distance distance = result.routes[0].legs[0].distance;
 
-		String startTemp = startCityCon.getTemperatureDesc();
-		String endTemp = endCityCon.getTemperatureDesc();
+		// String startTemp = startCityCon.getTemperatureDesc();
+		// String endTemp = endCityCon.getTemperatureDesc();
 
-		String info = "It is " + distance + " from " + start + " to " + end + ".  It is " + startTemp + " in " + start
-				+ ", and it is " + endTemp + " in " + end + ".  Muthafucka";
+		// String info = "It is " + distance + " from " + start + " to " + end +
+		// ". It is " + startTemp + " in " + start
+		// + ", and it is " + endTemp + " in " + end + ". Muthafucka";
 
+		String info = "";
 		return info;
 		// TODO: spaces mess with tempurature.
 	}

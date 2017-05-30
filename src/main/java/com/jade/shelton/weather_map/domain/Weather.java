@@ -36,8 +36,8 @@ public class Weather extends EasyApiObject implements Serializable {
 		return new WeatherConditions(apiKey);
 	}
 
-	public WeatherForecast2 createForecastObject() {
-		return new WeatherForecast2(apiKey);
+	public WeatherForecast createForecastObject() {
+		return new WeatherForecast(apiKey);
 	}
 
 	@Override

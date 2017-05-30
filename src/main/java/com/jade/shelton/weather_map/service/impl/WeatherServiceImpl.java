@@ -9,9 +9,10 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.jade.shelton.weather_map.domain.Weather;
 import com.jade.shelton.weather_map.domain.WeatherConditions;
-import com.jade.shelton.weather_map.domain.WeatherForecast2;
+import com.jade.shelton.weather_map.domain.WeatherForecast;
 import com.jade.shelton.weather_map.service.WeatherService;
 
 @Service
@@ -20,35 +21,15 @@ public class WeatherServiceImpl implements WeatherService {
 	public WeatherConditions getConditions(String key, String city) {
 		Weather weatherObject = new Weather(key);
 		WeatherConditions conditions = weatherObject.createConditionsObject();
-		try {
-			conditions.setParameters(city).downloadData();
-			System.out.println(conditions.getTemperatureF() + "F is the temp in " + city);
+		String url = conditions.setParamsReturnUrl(city);
+		conditions = downloadConditions(conditions, url);
 
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
 		return conditions;
-
 	}
 
-	/*
-	 * public WeatherForecast getForecast(String key, String city) { Weather
-	 * weatherObject = new Weather(key); WeatherForecast forecast =
-	 * weatherObject.createForecastObject(); try {
-	 * forecast.setParameters(city).downloadData();
-	 * System.out.println(forecast.getTemperatureF() + "F is the temp in " +
-	 * city);
-	 * 
-	 * } catch (Exception e) { System.out.println(e.getMessage()); } return
-	 * forecast;
-	 * 
-	 * }
-	 */
-
-	public WeatherForecast2 getForecast(String key, String city) {
+	public WeatherForecast getForecast(String key, String city) {
 		Weather weatherObject = new Weather(key);
-		WeatherForecast2 forecast = weatherObject.createForecastObject();
-		// forecast.setParameters(city).downloadDataHere();
+		WeatherForecast forecast = weatherObject.createForecastObject();
 		String url = forecast.setParamsReturnUrl(city);
 		forecast = downloadDataHere(forecast, url);
 
@@ -56,14 +37,34 @@ public class WeatherServiceImpl implements WeatherService {
 
 	}
 
-	// TODO: things aren't mapping to my created objects. WHY????
-	public WeatherForecast2 downloadDataHere(WeatherForecast2 forecast, String url) {
+	private WeatherConditions downloadConditions(WeatherConditions conditions, String url) {
+		JSONObject result;
+		String json = "";
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+
+		try {
+			result = constructJSON(url);
+			json = result.toString();
+			mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+			conditions = mapper.readValue(json, WeatherConditions.class);
+
+		} catch (Exception e1) {
+
+			e1.printStackTrace();
+			System.out.println("There was a problem " + e1);
+		}
+
+		return conditions;
+	}
+
+	private WeatherForecast downloadDataHere(WeatherForecast forecast, String url) {
 		JSONObject result;
 		String json = "";
 		try {
 			result = constructJSON(url);
 			json = result.toString();
-			forecast = new ObjectMapper().readValue(json, WeatherForecast2.class);
+			forecast = new ObjectMapper().readValue(json, WeatherForecast.class);
 
 		} catch (Exception e1) {
 
@@ -74,7 +75,7 @@ public class WeatherServiceImpl implements WeatherService {
 		return forecast;
 	}
 
-	public static JSONObject constructJSON(String URL) {
+	private JSONObject constructJSON(String URL) {
 
 		String content = "";
 		URL.replace(" ", "%20");
